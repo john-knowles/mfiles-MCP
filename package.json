@@ -1,6 +1,6 @@
 {
   "name": "mfiles-mcp",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "MCP server for the M-Files REST API (MFWS).",
   "type": "module",
   "main": "dist/index.js",
@@ -16,7 +16,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/john-knowles/mfiles-MCP/issues"
   },

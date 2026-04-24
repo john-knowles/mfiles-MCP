@@ -1,6 +1,10 @@
 # mfiles-MCP
 
+> [!CAUTION]
+> **Experimental:** This is an experimental Model Context Protocol (MCP) server that explores what might be possible for M-Files integration. It is provided "as is" for demonstration and discovery purposes.
+
 An MCP server for the **M-Files Web Service (MFWS) REST API**.
+
 
 ## What you get
 
