@@ -1,0 +1,30 @@
+import { z } from "zod";
+
+export const ToolName = {
+  DiscoverSchema: "discover_schema",
+  GenericRequest: "generic_mfiles_request",
+
+  ObjectsSearch: "mfiles_objects_search",
+  ObjectsGet: "mfiles_objects_get",
+  ObjectsCreate: "mfiles_objects_create",
+  ObjectsDelete: "mfiles_objects_delete",
+
+  ViewsList: "mfiles_views_list",
+  ViewsGetListing: "mfiles_views_get_listing",
+
+  StructurePropertyDefs: "mfiles_structure_propertydefs",
+  StructureClassDefs: "mfiles_structure_classdefs",
+  StructureObjectTypes: "mfiles_structure_objecttypes",
+
+  DownloadFile: "download_file",
+  UploadFile: "upload_file"
+} as const;
+
+export type ToolName = (typeof ToolName)[keyof typeof ToolName];
+
+export type ToolDef = {
+  name: string;
+  description: string;
+  inputSchema: z.ZodTypeAny;
+};
+
