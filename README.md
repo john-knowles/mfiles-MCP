@@ -21,6 +21,22 @@ An MCP server for the **M-Files Web Service (MFWS) REST API**.
 - **Generic escape hatch**: `generic_mfiles_request` for any endpoint not yet covered.
 - **Schema discovery**: `discover_schema` loads `/structure/properties` and `/structure/objecttypes`.
 
+## Available Tools
+
+- **`discover_schema`**: Fetch vault structure metadata to resolve property and object type IDs.
+- **`generic_mfiles_request`**: Execute any MFWS REST endpoint with support for method tunneling.
+- **`objects_search`**: Search objects with support for Quick Search (`q`) and human-readable property filters (e.g. `{ "Customer": "Acme" }`).
+- **`objects_get`**: Fetch a specific object version.
+- **`objects_create`**: Create new objects (e.g. Documents).
+- **`objects_delete`**: Delete objects from the vault.
+- **`views_list`**: List available vault views.
+- **`views_get_listing`**: Fetch items within a specific view.
+- **`structure_propertydefs`**: List all property definitions.
+- **`structure_classdefs`**: List all class definitions.
+- **`structure_objecttypes`**: List all object types.
+- **`download_file`**: Download files with automatic text extraction for `.txt`, `.md`, and `.pdf` files.
+- **`upload_file`**: Upload files to existing objects (handles checkout, temporary upload, and checkin).
+
 ## Setup
 
 Install deps:
