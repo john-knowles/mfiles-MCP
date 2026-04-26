@@ -58,6 +58,52 @@ function encodeQuery(params: Array<[string, string]>): string {
   );
 }
 
+function paginateAndFilter(
+  items: any[],
+  limit?: number,
+  offset?: number,
+  search?: string,
+  detailed: boolean = false
+): any[] {
+  if (!Array.isArray(items)) return [];
+
+  // 1) Normalize and filter
+  let processed = items;
+  if (search) {
+    const lower = search.toLowerCase();
+    processed = processed.filter((item) => {
+      const name = item?.Name ?? item?.DisplayName ?? item?.Alias;
+      const alias = item?.Alias;
+      return (
+        (typeof name === "string" && name.toLowerCase().includes(lower)) ||
+        (typeof alias === "string" && alias.toLowerCase().includes(lower))
+      );
+    });
+  }
+
+  // 2) Paginate
+  const start = offset ?? 0;
+  const end = limit ? start + limit : processed.length;
+  const page = processed.slice(start, end);
+
+  // 3) Strip if not detailed
+  if (!detailed) {
+    return page.map((item) => ({
+      // Enforce strict PascalCase for the API contract
+      ID: item?.ID ?? item?.Id ?? item?.PropertyDef ?? item?.PropertyDefID ?? item?.ObjectType ?? item?.ObjectTypeID,
+      Name: item?.Name ?? item?.DisplayName ?? item?.Alias,
+      Alias: item?.Alias ?? null
+    }));
+  }
+
+  // Even if detailed, ensure ID/Name are present in PascalCase for consistency
+  return page.map((item) => {
+    const ID = item?.ID ?? item?.Id ?? item?.PropertyDef ?? item?.PropertyDefID ?? item?.ObjectType ?? item?.ObjectTypeID;
+    const Name = item?.Name ?? item?.DisplayName ?? item?.Alias;
+    return { ...item, ID, Name };
+  });
+}
+
 async function checkout(mfiles: MFilesRequest, objectType: number, objectId: number): Promise<any> {
   // 2 == CheckedOutToMe
   return await mfiles.requestJson({
@@ -167,7 +213,14 @@ export async function callTool(
         if (filters && typeof filters === "object") {
           for (const [alias, v] of Object.entries(filters)) {
             const id = resolver.resolveAliasToId(alias);
-            if (id === null) continue;
+            if (id === null) {
+              // Fallback to numeric ID if alias fails
+              const numericId = Number(alias);
+              if (!isNaN(numericId)) {
+                params.push([`p${numericId}`, String(v)]);
+              }
+              continue;
+            }
             params.push([`p${id}`, String(v)]);
           }
         }
@@ -178,11 +231,31 @@ export async function callTool(
         qs = encodeQuery(params);
       }
 
-      const result = await mfiles.requestJson({
-        path: `/objects.aspx${qs}`,
-        method: "GET",
-        headers: { "X-Extensions": "MFWA" }
-      });
+      // M-Files search endpoints vary by server version/config. We try several patterns.
+      let result: any;
+      try {
+        // Pattern 1: .aspx + MFWA
+        result = await mfiles.requestJson({
+          path: `/objects.aspx${qs}`,
+          method: "GET",
+          headers: { "X-Extensions": "MFWA" }
+        });
+      } catch {
+        try {
+          // Pattern 2: .aspx without extension
+          result = await mfiles.requestJson({
+            path: `/objects.aspx${qs}`,
+            method: "GET"
+          });
+        } catch {
+          // Pattern 3: No extension
+          result = await mfiles.requestJson({
+            path: `/objects${qs}`,
+            method: "GET"
+          });
+        }
+      }
+
       return { content: toTextContent(friendlyifyResult(resolver, result)) };
     }
 
@@ -195,6 +268,20 @@ export async function callTool(
           : `/objects/${objectType}/${objectId}/latest.aspx`;
       const result = await mfiles.requestJson({ path, method: "GET" });
       return { content: toTextContent(friendlyifyResult(resolver, result)) };
+    }
+
+    case ToolName.ObjectsGetProperties: {
+      await resolver.ensureReady();
+      const { objectType, objectId, version } = args as any;
+      const verPart = version === "latest" ? "latest" : String(version);
+      const result = await mfiles.requestJson({
+        path: `/objects/${objectType}/${objectId}/${verPart}/properties.aspx`,
+        method: "GET"
+      });
+      // The response is a PropertyValues array. We wrap it in a pseudo-object
+      // so friendlyifyResult can process it into a Properties map.
+      const wrapped = { PropertyValues: result };
+      return { content: toTextContent(friendlyifyResult(resolver, wrapped)) };
     }
 
     case ToolName.ObjectsCreate: {
@@ -262,21 +349,23 @@ export async function callTool(
 
 
     case ToolName.StructurePropertyDefs: {
+      const { limit, offset, search, detailed } = args as any;
       const result = await mfiles.requestJson({
         path: "/structure/propertydefs.aspx",
         method: "GET",
         headers: { "X-Extensions": "MFWA" }
       });
-      return { content: toTextContent(result) };
+      return { content: toTextContent(paginateAndFilter(result as any[], limit, offset, search, detailed)) };
     }
     case ToolName.StructureClassDefs: {
+      const { limit, offset, search, detailed } = args as any;
       try {
         const result = await mfiles.requestJson({
           path: `/structure/classdefs.aspx`,
           method: "GET",
           headers: { "X-Extensions": "MFWA" }
         });
-        return { content: toTextContent(result) };
+        return { content: toTextContent(paginateAndFilter(result as any[], limit, offset, search, detailed)) };
       } catch {
         try {
           const result = await mfiles.requestJson({
@@ -284,13 +373,13 @@ export async function callTool(
             method: "GET",
             headers: { "X-Extensions": "MFWA" }
           });
-          return { content: toTextContent(result) };
+          return { content: toTextContent(paginateAndFilter(result as any[], limit, offset, search, detailed)) };
         } catch {
           const result = await mfiles.requestJson({
             path: `/valuelists/1/items.aspx`,
             method: "GET"
           });
-          return { content: toTextContent(result) };
+          return { content: toTextContent(paginateAndFilter(result as any[], limit, offset, search, detailed)) };
         }
       }
     }
@@ -303,12 +392,13 @@ export async function callTool(
       return { content: toTextContent(result) };
     }
     case ToolName.StructureObjectTypes: {
+      const { limit, offset, search, detailed } = args as any;
       const result = await mfiles.requestJson({
         path: "/structure/objecttypes.aspx",
         method: "GET",
         headers: { "X-Extensions": "MFWA" }
       });
-      return { content: toTextContent(result) };
+      return { content: toTextContent(paginateAndFilter(result as any[], limit, offset, search, detailed)) };
     }
 
     case ToolName.DownloadFile: {
@@ -352,8 +442,10 @@ export async function callTool(
       if (extension === "pdf") {
         try {
           const { bytes } = await mfiles.requestBytes({ path: contentPath, method: "GET" });
-          const pdfParse = (pdfParseNs as any).default ?? (pdfParseNs as any);
-          const data = await pdfParse(Buffer.from(bytes));
+          const PDFParse = (pdfParseNs as any).PDFParse || (pdfParseNs as any).default || pdfParseNs;
+          const parser = new (PDFParse as any)({ data: Buffer.from(bytes) });
+          const data = await parser.getText();
+          await parser.destroy();
           return {
             content: toTextContent({
               filename,

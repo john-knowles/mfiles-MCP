@@ -58,11 +58,24 @@ export const tools: ToolDef[] = [
   {
     name: ToolName.ObjectsGet,
     description:
-      "Get an object version via `/objects/{type}/{id}/latest.aspx` or `/objects/{type}/{id}/{version}.aspx`.",
+      "Get an object version (metadata only) via `/objects/{type}/{id}/latest.aspx` or `/objects/{type}/{id}/{version}.aspx`.",
     inputSchema: z.object({
       objectType: z.number().int().nonnegative(),
       objectId: z.number().int().positive(),
       version: z.number().int().positive().optional().describe("If omitted, uses `latest`.")
+    })
+  },
+  {
+    name: ToolName.ObjectsGetProperties,
+    description:
+      "Get all property values for a specific object version via `/objects/{type}/{id}/{version}/properties.aspx`. Returns both raw and human-readable property names.",
+    inputSchema: z.object({
+      objectType: z.number().int().nonnegative(),
+      objectId: z.number().int().positive(),
+      version: z
+        .union([z.number().int().positive(), z.literal("latest")])
+        .default("latest")
+        .describe("Object version number or `latest`.")
     })
   },
   {
@@ -122,13 +135,23 @@ export const tools: ToolDef[] = [
   // /structure
   {
     name: ToolName.StructurePropertyDefs,
-    description: "List property definitions via `/structure/propertydefs.aspx`.",
-    inputSchema: z.object({})
+    description: "Lists property definitions with optional filtering and pagination.",
+    inputSchema: z.object({
+      limit: z.number().int().positive().optional().describe("Optional limit for results."),
+      offset: z.number().int().min(0).optional().describe("Optional offset for results."),
+      search: z.string().optional().describe("Optional name/alias filter (case-insensitive)."),
+      detailed: z.boolean().optional().default(false).describe("If true, returns full metadata objects.")
+    })
   },
   {
     name: ToolName.StructureClassDefs,
-    description: "List class definitions via `/structure/classdefs.aspx`.",
-    inputSchema: z.object({})
+    description: "Lists class definitions with optional filtering and pagination.",
+    inputSchema: z.object({
+      limit: z.number().int().positive().optional().describe("Optional limit for results."),
+      offset: z.number().int().min(0).optional().describe("Optional offset for results."),
+      search: z.string().optional().describe("Optional name/alias filter (case-insensitive)."),
+      detailed: z.boolean().optional().default(false).describe("If true, returns full metadata objects.")
+    })
   },
   {
     name: ToolName.StructureClassDetails,
@@ -139,8 +162,13 @@ export const tools: ToolDef[] = [
   },
   {
     name: ToolName.StructureObjectTypes,
-    description: "List object types via `/structure/objecttypes.aspx`.",
-    inputSchema: z.object({})
+    description: "Lists object types with optional filtering and pagination.",
+    inputSchema: z.object({
+      limit: z.number().int().positive().optional().describe("Optional limit for results."),
+      offset: z.number().int().min(0).optional().describe("Optional offset for results."),
+      search: z.string().optional().describe("Optional name/alias filter (case-insensitive)."),
+      detailed: z.boolean().optional().default(false).describe("If true, returns full metadata objects.")
+    })
   },
 
   // /files

@@ -40,8 +40,9 @@ Core tools for interacting with data within the M-Files vault.
 
 | Tool Name | Purpose | Sample Prompt |
 | :--- | :--- | :--- |
-| `mfiles_objects_search` | Search for objects using text or property filters. | "Find all documents with 'Invoice' in the title." or "Search for documents where 'Customer' is 'Acme'." |
+| `mfiles_objects_search` | Search for objects using text or property filters. | "Find all documents with 'Invoice' in the title." or "Search for documents where 'Customer' is 'Acme'." (Tip: Use `queryString` for name-based searches, or find the ID first for Lookup properties like 'Customer'). |
 | `mfiles_objects_get` | Get detailed metadata for a specific object version. | "Get the full details for Document ID 123." |
+| `mfiles_objects_get_properties` | **New:** Get all property values for an object. | "Show me all the property values for Document ID 123." |
 | `mfiles_objects_create_simple` | **Recommended** for creating objects using simple names. (Requires `discover_schema` first). | "Create a new Document called 'Project Plan' in the 'Project' class." |
 | `mfiles_objects_create` | Advanced object creation using the full MFWS JSON structure. | "Create a document using this JSON: `{\"PropertyValues\": [{\"PropertyDef\": 100, \"TypedValue\": {\"DataType\": 9, \"Lookup\": {\"Item\": 0}}}, {\"PropertyDef\": 0, \"TypedValue\": {\"DataType\": 1, \"Value\": \"New Document\"}}]}`" |
 | `mfiles_objects_delete` | Deletes an object from the vault. | "Delete document ID 456." |
@@ -59,7 +60,7 @@ Tools for reading from and writing to files stored inside M-Files objects.
 ### 🛠️ System
 | Tool Name | Purpose | Sample Prompt |
 | :--- | :--- | :--- |
-| `generic_mfiles_request` | Performs a raw REST API call to any M-Files endpoint. | "Make a GET request to the `/server.aspx` endpoint to check the version." |
+| `generic_mfiles_request` | Performs a raw REST API call to any M-Files endpoint. | "Use `/server/version.aspx` to tell me the version of M-files" or "Use `/server/vaults.aspx` to get vault information." |
 
 > [!TIP]
 > **Best Practice:** Always start with `discover_schema`. This helps the AI map names (like "Customer") to internal IDs, making subsequent prompts much more reliable.

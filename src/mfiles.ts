@@ -121,7 +121,8 @@ export class MetadataResolver {
     try {
       const data = await this.mfiles.requestJson<any>({
         path: "/structure/classes.aspx",
-        method: "GET"
+        method: "GET",
+        headers: { "X-Extensions": "MFWA" }
       });
       return this.unwrapArray(data);
     } catch {

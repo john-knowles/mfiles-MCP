@@ -263,14 +263,33 @@ export class MFilesRequest {
     const init: RequestInit = { method, headers };
     if (body !== undefined) init.body = body;
 
-    const res = await fetch(url, init);
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      throw new Error(
-        `M-Files request failed: ${args.method} ${path} -> ${res.status} ${res.statusText}\n${text.slice(0, 1500)}`
-      );
+    let lastError: Error | null = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const res = await fetch(url, init);
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          // Retry on 5xx errors (transient)
+          if (res.status >= 500 && attempt < 3) {
+            await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+            continue;
+          }
+          throw new Error(
+            `M-Files request failed: ${args.method} ${path} -> ${res.status} ${res.statusText}\n${text.slice(0, 1500)}`
+          );
+        }
+        return res;
+      } catch (err: any) {
+        lastError = err;
+        if (attempt < 3) {
+          // Wait before retry
+          await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+          continue;
+        }
+        throw err;
+      }
     }
-    return res;
+    throw lastError || new Error("M-Files request failed (exhausted retries).");
   }
 }
 
