@@ -21,55 +21,58 @@ An MCP server for the **M-Files Web Service (MFWS) REST API**.
 - **Generic escape hatch**: `generic_mfiles_request` for any endpoint not yet covered.
 - **Schema discovery**: `discover_schema` loads `/structure/properties` and `/structure/objecttypes`.
 
-## Available Tools
+## Tools & Verification
 
-- **`discover_schema`**: Fetch vault structure metadata (properties, object types, and classes) to resolve IDs.
-- **`generic_mfiles_request`**: Execute any MFWS REST endpoint with support for method tunneling.
-- **`mfiles_objects_search`**: Search objects with support for Quick Search (`q`) and human-readable property filters (e.g. `{ "Customer": "Acme" }`).
-- **`mfiles_objects_get`**: Fetch a specific object version.
-- **`mfiles_objects_create`**: Create new objects (e.g. Documents).
-- **`mfiles_objects_delete`**: Delete objects from the vault.
-- **`mfiles_objects_checkout`**: Check out an object for editing or deletion.
-- **`mfiles_objects_checkin`**: Check in a previously checked-out object version.
-- **`mfiles_views_list`**: List available vault views.
-- **`mfiles_views_get_listing`**: Fetch items within a specific view.
-- **`mfiles_structure_propertydefs`**: List all property definitions.
-- **`mfiles_structure_classdefs`**: List all class definitions (with multiple fallback endpoints).
-- **`mfiles_structure_classdetails`**: Get detailed metadata for a specific class (e.g. mandatory properties).
-- **`mfiles_structure_objecttypes`**: List all object types.
-- **`download_file`**: Download files with automatic text extraction for `.txt`, `.md`, and `.pdf` files.
-- **`upload_file`**: Upload files to existing objects (handles checkout, temporary upload, and checkin).
+Below is a categorized list of all available tools along with sample prompts you can use to verify their functionality.
 
-## Example Prompts
+### 🏗️ Schema & Structure
+These tools help the AI understand the vault's metadata, which is often required before performing more complex tasks.
 
-To get the most out of this MCP server, use multi-step workflows.
+| Tool Name | Purpose | Sample Prompt |
+| :--- | :--- | :--- |
+| `discover_schema` | Fetches core vault structure (properties/object types). | "Initialize the vault schema so you can resolve property names." |
+| `mfiles_structure_propertydefs` | Lists all property definitions. | "Show me a list of all property definitions in the vault." |
+| `mfiles_structure_classdefs` | Lists all class definitions. | "List all available classes in M-Files." |
+| `mfiles_structure_classdetails` | Gets details for a specific class (e.g., mandatory properties). | "What are the required properties for the 'Customer' class?" |
+| `mfiles_structure_objecttypes` | Lists all object types (Documents, Customers, etc.). | "What object types are available in this vault?" |
 
-### 1. Discovery & Setup
-"Discover the M-Files vault schema to see available properties, object types, and classes."
+### 🔍 Search & Objects
+Core tools for interacting with data within the M-Files vault.
 
-### 2. Search & Retrieval
-"Search for documents where the 'Customer' property is 'Acme' and 'Document Date' is in 2025."
-"Show me the contents of the 'All Projects' view (ID 101)."
+| Tool Name | Purpose | Sample Prompt |
+| :--- | :--- | :--- |
+| `mfiles_objects_search` | Search for objects using text or property filters. | "Find all documents with 'Invoice' in the title." or "Search for documents where 'Customer' is 'Acme'." |
+| `mfiles_objects_get` | Get detailed metadata for a specific object version. | "Get the full details for Document ID 123." |
+| `mfiles_objects_create_simple` | **Recommended** for creating objects using simple names. | "Create a new Document called 'Project Plan' in the 'Project' class." |
+| `mfiles_objects_create` | Advanced object creation using the full MFWS JSON structure. | "Create a document using this specific raw JSON payload: {...}" |
+| `mfiles_objects_delete` | Deletes an object from the vault. | "Delete document ID 456." |
+| `mfiles_objects_checkout` | Checks out an object to allow for editing or file updates. | "Check out document ID 123 so I can update it." |
+| `mfiles_objects_checkin` | Checks in an object to save changes and create a new version. | "Check in document ID 123 version 5." |
 
-### 3. Creating and Managing Objects
-> [!IMPORTANT]
-> To create an object, you usually need the `Class` ID and any mandatory property IDs. 
-> 1. Use `discover_schema` or `mfiles_structure_classdefs` to find the target class ID.
-> 2. Use `mfiles_structure_classdetails` with that ID to identify mandatory property IDs.
-> 3. Use `mfiles_objects_create` to create the object.
+### 📁 Files
+Tools for reading from and writing to files stored inside M-Files objects.
 
-"Show me the mandatory properties for the 'Customer' class (ID 5)."
-"Create a new document in the 'General Document' class. Set the title to 'Project Plan' and the project property to 'Project Alpha'."
+| Tool Name | Purpose | Sample Prompt |
+| :--- | :--- | :--- |
+| `download_file` | Reads file content. (Returns text for .txt/.md/.pdf). | "Read the content of the file in document ID 789." |
+| `upload_file` | Uploads a new file to an existing object. | "Upload a new text file named 'notes.txt' with the content 'Hello World' to document ID 123." |
+
+### 📂 Views
+Tools for navigating the virtual folder structure (Views) defined in M-Files.
+
+| Tool Name | Purpose | Sample Prompt |
+| :--- | :--- | :--- |
+| `mfiles_views_list` | Lists the top-level views. | "List the views available in the root of the vault." |
+| `mfiles_views_get_listing` | Lists items inside a specific view. | "Show me everything inside the 'All Documents' view (ID 1)." |
+
+### 🛠️ System
+| Tool Name | Purpose | Sample Prompt |
+| :--- | :--- | :--- |
+| `generic_mfiles_request` | Performs a raw REST API call to any M-Files endpoint. | "Make a GET request to the `/server/vaults` endpoint." |
 
 > [!TIP]
-> Some vaults require an object to be checked out before it can be deleted. Use `mfiles_objects_checkout` followed by `mfiles_objects_delete`.
+> **Best Practice:** Always start with `discover_schema`. This helps the AI map names (like "Customer") to internal IDs, making subsequent prompts much more reliable.
 
-"Check out document ID 123 and then delete it."
-"Check in document ID 456 (version 2)."
-
-### 4. Working with Files
-"Download and read the content of the PDF file (ID 789) attached to document 123."
-"Upload a new text file named 'meeting_notes.md' to document 456 with the content 'Draft notes for the kick-off meeting'."
 
 ## Setup
 

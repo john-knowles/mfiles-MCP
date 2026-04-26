@@ -215,6 +215,28 @@ export async function callTool(
         };
       }
     }
+    case ToolName.ObjectsCreateSimple: {
+      const { objectType, properties } = args as any;
+      await resolver.ensureReady();
+      try {
+        const propertyValues = resolver.createPropertyValues(properties);
+        const result = await mfiles.requestJson({
+          path: `/objects/${objectType}.aspx`,
+          method: "POST",
+          body: { PropertyValues: propertyValues }
+        });
+        return { content: toTextContent(friendlyifyResult(resolver, result)) };
+      } catch (err: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Object creation failed: ${err.message}\n\nTip: Use 'mfiles_structure_classdetails' to see mandatory property names/IDs for a class.`
+            }
+          ]
+        };
+      }
+    }
 
     case ToolName.ObjectsDelete: {
       const { objectType, objectId } = args as any;

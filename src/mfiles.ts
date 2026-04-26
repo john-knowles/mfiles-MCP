@@ -176,6 +176,37 @@ export class MetadataResolver {
 
     return { ...(value as any), Properties: out };
   }
+
+  /**
+   * Constructs a MFWS PropertyValues array from a simple object of property names/IDs and values.
+   */
+  createPropertyValues(properties: Record<string, unknown>): any[] {
+    return Object.entries(properties).map(([key, value]) => {
+      const id = this.resolveAliasToId(key) ?? coerceId(key);
+      if (id === null) throw new Error(`Could not resolve property: ${key}`);
+
+      let typedValue: any;
+      if (typeof value === "boolean") {
+        typedValue = { DataType: 8, Value: value };
+      } else if (typeof value === "number") {
+        // If it's a number and it's the 'Class' property (ID 100), it's a Lookup.
+        if (id === 100) {
+          typedValue = { DataType: 9, Lookup: { Item: value } };
+        } else {
+          // Default to Integer for other numbers if we don't have schema info.
+          // Note: many properties in M-Files are lookups, but we don't have full schema here.
+          typedValue = { DataType: 2, Value: value };
+        }
+      } else if (value === null) {
+        typedValue = { DataType: 0, Value: null }; // Unset
+      } else {
+        // Default to Text.
+        typedValue = { DataType: 1, Value: String(value) };
+      }
+
+      return { PropertyDef: id, TypedValue: typedValue };
+    });
+  }
 }
 
 export function friendlyifyResult(resolver: MetadataResolver, value: unknown): unknown {

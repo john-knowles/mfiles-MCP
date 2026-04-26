@@ -7,6 +7,7 @@ export const ToolName = {
   ObjectsSearch: "mfiles_objects_search",
   ObjectsGet: "mfiles_objects_get",
   ObjectsCreate: "mfiles_objects_create",
+  ObjectsCreateSimple: "mfiles_objects_create_simple",
   ObjectsDelete: "mfiles_objects_delete",
   ObjectsCheckout: "mfiles_objects_checkout",
   ObjectsCheckin: "mfiles_objects_checkin",

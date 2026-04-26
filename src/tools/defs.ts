@@ -83,6 +83,16 @@ export const tools: ToolDef[] = [
     })
   },
   {
+    name: ToolName.ObjectsCreateSimple,
+    description: "Create a new object using a simplified property map. Automatically constructs the complex MFWS payload.",
+    inputSchema: z.object({
+      objectType: z.number().int().nonnegative().default(0),
+      properties: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).describe(
+        "A map of property names or IDs to their values. Example: { \"Class\": 5, \"Name or title\": \"My Doc\" }. IDs for Class (100) and Name (0) are handled automatically."
+      )
+    })
+  },
+  {
     name: ToolName.ObjectsDelete,
     description:
       "Delete an object via `/objects/{type}/{id}.aspx` (DELETE tunneled if needed).",
