@@ -284,27 +284,6 @@ export async function callTool(
       return { content: toTextContent(friendlyifyResult(resolver, wrapped)) };
     }
 
-    case ToolName.ObjectsCreate: {
-      const { objectType, objectVersion } = args as any;
-      try {
-        const result = await mfiles.requestJson({
-          path: `/objects/${objectType}.aspx`,
-          method: "POST",
-          body: objectVersion
-        });
-        return { content: toTextContent(result) };
-      } catch (err: any) {
-        // Return a helpful error message to the LLM.
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Object creation failed: ${err.message}\n\nTip: M-Files typically requires mandatory properties like 'Class' (ID 100) and 'Name or title' (ID 0). If you're unsure which properties are required, use 'mfiles_structure_classdetails' with the target class ID to see mandatory property definitions.`
-            }
-          ]
-        };
-      }
-    }
     case ToolName.ObjectsCreateSimple: {
       const { objectType, properties } = args as any;
       await resolver.ensureReady();

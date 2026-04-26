@@ -79,23 +79,6 @@ export const tools: ToolDef[] = [
     })
   },
   {
-    name: ToolName.ObjectsCreate,
-    description:
-      "Create a new object (typically a document) via `/objects/{objectType}.aspx` with an `ObjectVersion` payload.",
-    inputSchema: z.object({
-      objectType: z
-        .number()
-        .int()
-        .nonnegative()
-        .describe("Object type ID, e.g. 0 for Documents."),
-      objectVersion: z
-        .unknown()
-        .describe(
-          "ObjectVersion payload. Usually includes `PropertyValues` and optionally `Files`. See MFWS examples for creating documents."
-        )
-    })
-  },
-  {
     name: ToolName.ObjectsCreateSimple,
     description: "Create a new object using a simplified property map. Automatically constructs the complex MFWS payload.",
     inputSchema: z.object({
