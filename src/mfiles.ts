@@ -89,8 +89,12 @@ export class MetadataResolver {
   }
 
   private async fetchPropertyDefinitions(): Promise<any[]> {
-    const path = "/structure/properties";
-    const data = await this.mfiles.requestJson<any>({ path, method: "GET" });
+    const path = "/structure/properties.aspx";
+    const data = await this.mfiles.requestJson<any>({ 
+      path, 
+      method: "GET",
+      headers: { "X-Extensions": "MFWA" }
+    });
     const arr = this.unwrapArray(data);
     if (arr.length === 0) {
       throw new Error(`Empty property list from ${path} (unexpected shape or no items).`);
@@ -99,8 +103,12 @@ export class MetadataResolver {
   }
 
   private async fetchObjectTypes(): Promise<any[]> {
-    const path = "/structure/objecttypes";
-    const data = await this.mfiles.requestJson<any>({ path, method: "GET" });
+    const path = "/structure/objecttypes.aspx";
+    const data = await this.mfiles.requestJson<any>({ 
+      path, 
+      method: "GET",
+      headers: { "X-Extensions": "MFWA" }
+    });
     const arr = this.unwrapArray(data);
     if (arr.length === 0) {
       throw new Error(`Empty object type list from ${path} (unexpected shape or no items).`);

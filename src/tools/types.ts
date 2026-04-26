@@ -12,8 +12,6 @@ export const ToolName = {
   ObjectsCheckout: "mfiles_objects_checkout",
   ObjectsCheckin: "mfiles_objects_checkin",
 
-  ViewsList: "mfiles_views_list",
-  ViewsGetListing: "mfiles_views_get_listing",
 
   StructurePropertyDefs: "mfiles_structure_propertydefs",
   StructureClassDefs: "mfiles_structure_classdefs",

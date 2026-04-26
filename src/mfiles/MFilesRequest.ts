@@ -49,6 +49,7 @@ export class MFilesRequest {
 
   private authHeaders(extra?: Record<string, string>): Record<string, string> {
     const headers: Record<string, string> = {
+      "Accept": "application/json",
       ...(extra || {}),
       "X-Authentication": this.authToken!
     };

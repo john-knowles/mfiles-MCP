@@ -119,25 +119,6 @@ export const tools: ToolDef[] = [
     })
   },
 
-  // /views
-  {
-    name: ToolName.ViewsList,
-    description: "List views via `/views.aspx`.",
-    inputSchema: z.object({})
-  },
-  {
-    name: ToolName.ViewsGetListing,
-    description:
-      "Get a view listing via `/views/{viewId}/items.aspx` (optionally with query string).",
-    inputSchema: z.object({
-      viewId: z.number().int().nonnegative(),
-      query: z
-        .string()
-        .optional()
-        .describe("Optional query string beginning with `?`, passed through as-is.")
-    })
-  },
-
   // /structure
   {
     name: ToolName.StructurePropertyDefs,

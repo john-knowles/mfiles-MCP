@@ -15,7 +15,6 @@ An MCP server for the **M-Files Web Service (MFWS) REST API**.
   - Supports MFWS IIS compatibility method tunneling for `PUT`/`DELETE` via `?_method=`
 - **High-value tools first**
   - `/objects`: search, create, delete
-  - `/views`: list views and fetch view listing
   - `/structure`: propertydefs, classdefs, objecttypes
   - `/files`: `download_file` (text extraction where possible) + `upload_file` (spec-correct temp upload flow)
 - **Generic escape hatch**: `generic_mfiles_request` for any endpoint not yet covered.
@@ -43,8 +42,8 @@ Core tools for interacting with data within the M-Files vault.
 | :--- | :--- | :--- |
 | `mfiles_objects_search` | Search for objects using text or property filters. | "Find all documents with 'Invoice' in the title." or "Search for documents where 'Customer' is 'Acme'." |
 | `mfiles_objects_get` | Get detailed metadata for a specific object version. | "Get the full details for Document ID 123." |
-| `mfiles_objects_create_simple` | **Recommended** for creating objects using simple names. | "Create a new Document called 'Project Plan' in the 'Project' class." |
-| `mfiles_objects_create` | Advanced object creation using the full MFWS JSON structure. | "Create a document using this specific raw JSON payload: {...}" |
+| `mfiles_objects_create_simple` | **Recommended** for creating objects using simple names. (Requires `discover_schema` first). | "Create a new Document called 'Project Plan' in the 'Project' class." |
+| `mfiles_objects_create` | Advanced object creation using the full MFWS JSON structure. | "Create a document using this JSON: `{\"PropertyValues\": [{\"PropertyDef\": 100, \"TypedValue\": {\"DataType\": 9, \"Lookup\": {\"Item\": 0}}}, {\"PropertyDef\": 0, \"TypedValue\": {\"DataType\": 1, \"Value\": \"New Document\"}}]}`" |
 | `mfiles_objects_delete` | Deletes an object from the vault. | "Delete document ID 456." |
 | `mfiles_objects_checkout` | Checks out an object to allow for editing or file updates. | "Check out document ID 123 so I can update it." |
 | `mfiles_objects_checkin` | Checks in an object to save changes and create a new version. | "Check in document ID 123 version 5." |
@@ -57,18 +56,10 @@ Tools for reading from and writing to files stored inside M-Files objects.
 | `download_file` | Reads file content. (Returns text for .txt/.md/.pdf). | "Read the content of the file in document ID 789." |
 | `upload_file` | Uploads a new file to an existing object. | "Upload a new text file named 'notes.txt' with the content 'Hello World' to document ID 123." |
 
-### 📂 Views
-Tools for navigating the virtual folder structure (Views) defined in M-Files.
-
-| Tool Name | Purpose | Sample Prompt |
-| :--- | :--- | :--- |
-| `mfiles_views_list` | Lists the top-level views. | "List the views available in the root of the vault." |
-| `mfiles_views_get_listing` | Lists items inside a specific view. | "Show me everything inside the 'All Documents' view (ID 1)." |
-
 ### 🛠️ System
 | Tool Name | Purpose | Sample Prompt |
 | :--- | :--- | :--- |
-| `generic_mfiles_request` | Performs a raw REST API call to any M-Files endpoint. | "Make a GET request to the `/server/vaults` endpoint." |
+| `generic_mfiles_request` | Performs a raw REST API call to any M-Files endpoint. | "Make a GET request to the `/server.aspx` endpoint to check the version." |
 
 > [!TIP]
 > **Best Practice:** Always start with `discover_schema`. This helps the AI map names (like "Customer") to internal IDs, making subsequent prompts much more reliable.

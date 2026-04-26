@@ -89,12 +89,14 @@ export async function callTool(
   switch (name) {
     case ToolName.DiscoverSchema: {
       const propertyDefinitions = await mfiles.requestJson({
-        path: "/structure/properties",
-        method: "GET"
+        path: "/structure/properties.aspx",
+        method: "GET",
+        headers: { "X-Extensions": "MFWA" }
       });
       const objectTypes = await mfiles.requestJson({
-        path: "/structure/objecttypes",
-        method: "GET"
+        path: "/structure/objecttypes.aspx",
+        method: "GET",
+        headers: { "X-Extensions": "MFWA" }
       });
 
       let classDefinitions: any[] = [];
@@ -178,7 +180,8 @@ export async function callTool(
 
       const result = await mfiles.requestJson({
         path: `/objects.aspx${qs}`,
-        method: "GET"
+        method: "GET",
+        headers: { "X-Extensions": "MFWA" }
       });
       return { content: toTextContent(friendlyifyResult(resolver, result)) };
     }
@@ -257,25 +260,12 @@ export async function callTool(
       return { content: toTextContent(result) };
     }
 
-    case ToolName.ViewsList: {
-      const result = await mfiles.requestJson({ path: "/views.aspx", method: "GET" });
-      return { content: toTextContent(result) };
-    }
-
-    case ToolName.ViewsGetListing: {
-      const { viewId, query } = args as any;
-      const q = typeof query === "string" && query.length > 0 ? query : "";
-      const result = await mfiles.requestJson({
-        path: `/views/${viewId}/items.aspx${q}`,
-        method: "GET"
-      });
-      return { content: toTextContent(result) };
-    }
 
     case ToolName.StructurePropertyDefs: {
       const result = await mfiles.requestJson({
         path: "/structure/propertydefs.aspx",
-        method: "GET"
+        method: "GET",
+        headers: { "X-Extensions": "MFWA" }
       });
       return { content: toTextContent(result) };
     }
@@ -283,14 +273,16 @@ export async function callTool(
       try {
         const result = await mfiles.requestJson({
           path: `/structure/classdefs.aspx`,
-          method: "GET"
+          method: "GET",
+          headers: { "X-Extensions": "MFWA" }
         });
         return { content: toTextContent(result) };
       } catch {
         try {
           const result = await mfiles.requestJson({
             path: `/structure/classes.aspx`,
-            method: "GET"
+            method: "GET",
+            headers: { "X-Extensions": "MFWA" }
           });
           return { content: toTextContent(result) };
         } catch {
@@ -313,7 +305,8 @@ export async function callTool(
     case ToolName.StructureObjectTypes: {
       const result = await mfiles.requestJson({
         path: "/structure/objecttypes.aspx",
-        method: "GET"
+        method: "GET",
+        headers: { "X-Extensions": "MFWA" }
       });
       return { content: toTextContent(result) };
     }
