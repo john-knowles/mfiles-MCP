@@ -140,6 +140,13 @@ export const tools: ToolDef[] = [
     inputSchema: z.object({})
   },
   {
+    name: ToolName.StructureClassDetails,
+    description: "Get detailed information for a specific class, including mandatory properties.",
+    inputSchema: z.object({
+      classId: z.number().int().nonnegative().describe("The ID of the class to fetch.")
+    })
+  },
+  {
     name: ToolName.StructureObjectTypes,
     description: "List object types via `/structure/objecttypes.aspx`.",
     inputSchema: z.object({})

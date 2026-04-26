@@ -196,12 +196,24 @@ export async function callTool(
 
     case ToolName.ObjectsCreate: {
       const { objectType, objectVersion } = args as any;
-      const result = await mfiles.requestJson({
-        path: `/objects/${objectType}.aspx`,
-        method: "POST",
-        body: objectVersion
-      });
-      return { content: toTextContent(result) };
+      try {
+        const result = await mfiles.requestJson({
+          path: `/objects/${objectType}.aspx`,
+          method: "POST",
+          body: objectVersion
+        });
+        return { content: toTextContent(result) };
+      } catch (err: any) {
+        // Return a helpful error message to the LLM.
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Object creation failed: ${err.message}\n\nTip: M-Files typically requires mandatory properties like 'Class' (ID 100) and 'Name or title' (ID 0). If you're unsure which properties are required, use 'mfiles_structure_classdetails' with the target class ID to see mandatory property definitions.`
+            }
+          ]
+        };
+      }
     }
 
     case ToolName.ObjectsDelete: {
@@ -248,25 +260,33 @@ export async function callTool(
     case ToolName.StructureClassDefs: {
       try {
         const result = await mfiles.requestJson({
-          path: "/structure/classdefs.aspx",
+          path: `/structure/classdefs.aspx`,
           method: "GET"
         });
         return { content: toTextContent(result) };
       } catch {
         try {
           const result = await mfiles.requestJson({
-            path: "/structure/classes.aspx",
+            path: `/structure/classes.aspx`,
             method: "GET"
           });
           return { content: toTextContent(result) };
         } catch {
           const result = await mfiles.requestJson({
-            path: "/valuelists/1/items.aspx",
+            path: `/valuelists/1/items.aspx`,
             method: "GET"
           });
           return { content: toTextContent(result) };
         }
       }
+    }
+    case ToolName.StructureClassDetails: {
+      const { classId } = args as any;
+      const result = await mfiles.requestJson({
+        path: `/structure/classes/${classId}.aspx`,
+        method: "GET"
+      });
+      return { content: toTextContent(result) };
     }
     case ToolName.StructureObjectTypes: {
       const result = await mfiles.requestJson({

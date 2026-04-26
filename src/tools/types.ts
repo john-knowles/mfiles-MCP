@@ -16,6 +16,7 @@ export const ToolName = {
 
   StructurePropertyDefs: "mfiles_structure_propertydefs",
   StructureClassDefs: "mfiles_structure_classdefs",
+  StructureClassDetails: "mfiles_structure_classdetails",
   StructureObjectTypes: "mfiles_structure_objecttypes",
 
   DownloadFile: "download_file",

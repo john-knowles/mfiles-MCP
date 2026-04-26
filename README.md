@@ -35,6 +35,7 @@ An MCP server for the **M-Files Web Service (MFWS) REST API**.
 - **`mfiles_views_get_listing`**: Fetch items within a specific view.
 - **`mfiles_structure_propertydefs`**: List all property definitions.
 - **`mfiles_structure_classdefs`**: List all class definitions (with multiple fallback endpoints).
+- **`mfiles_structure_classdetails`**: Get detailed metadata for a specific class (e.g. mandatory properties).
 - **`mfiles_structure_objecttypes`**: List all object types.
 - **`download_file`**: Download files with automatic text extraction for `.txt`, `.md`, and `.pdf` files.
 - **`upload_file`**: Upload files to existing objects (handles checkout, temporary upload, and checkin).
@@ -52,8 +53,12 @@ To get the most out of this MCP server, use multi-step workflows.
 
 ### 3. Creating and Managing Objects
 > [!IMPORTANT]
-> To create an object, you usually need the `Class` ID and any mandatory property IDs. Use `discover_schema` first if you don't have them.
+> To create an object, you usually need the `Class` ID and any mandatory property IDs. 
+> 1. Use `discover_schema` or `mfiles_structure_classdefs` to find the target class ID.
+> 2. Use `mfiles_structure_classdetails` with that ID to identify mandatory property IDs.
+> 3. Use `mfiles_objects_create` to create the object.
 
+"Show me the mandatory properties for the 'Customer' class (ID 5)."
 "Create a new document in the 'General Document' class. Set the title to 'Project Plan' and the project property to 'Project Alpha'."
 
 > [!TIP]
