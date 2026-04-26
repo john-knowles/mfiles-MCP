@@ -23,19 +23,40 @@ An MCP server for the **M-Files Web Service (MFWS) REST API**.
 
 ## Available Tools
 
-- **`discover_schema`**: Fetch vault structure metadata to resolve property and object type IDs.
+- **`discover_schema`**: Fetch vault structure metadata (properties, object types, and classes) to resolve IDs.
 - **`generic_mfiles_request`**: Execute any MFWS REST endpoint with support for method tunneling.
-- **`objects_search`**: Search objects with support for Quick Search (`q`) and human-readable property filters (e.g. `{ "Customer": "Acme" }`).
-- **`objects_get`**: Fetch a specific object version.
-- **`objects_create`**: Create new objects (e.g. Documents).
-- **`objects_delete`**: Delete objects from the vault.
-- **`views_list`**: List available vault views.
-- **`views_get_listing`**: Fetch items within a specific view.
-- **`structure_propertydefs`**: List all property definitions.
-- **`structure_classdefs`**: List all class definitions.
-- **`structure_objecttypes`**: List all object types.
+- **`mfiles_objects_search`**: Search objects with support for Quick Search (`q`) and human-readable property filters (e.g. `{ "Customer": "Acme" }`).
+- **`mfiles_objects_get`**: Fetch a specific object version.
+- **`mfiles_objects_create`**: Create new objects (e.g. Documents).
+- **`mfiles_objects_delete`**: Delete objects from the vault.
+- **`mfiles_views_list`**: List available vault views.
+- **`mfiles_views_get_listing`**: Fetch items within a specific view.
+- **`mfiles_structure_propertydefs`**: List all property definitions.
+- **`mfiles_structure_classdefs`**: List all class definitions (with multiple fallback endpoints).
+- **`mfiles_structure_objecttypes`**: List all object types.
 - **`download_file`**: Download files with automatic text extraction for `.txt`, `.md`, and `.pdf` files.
 - **`upload_file`**: Upload files to existing objects (handles checkout, temporary upload, and checkin).
+
+## Example Prompts
+
+To get the most out of this MCP server, use multi-step workflows.
+
+### 1. Discovery & Setup
+"Discover the M-Files vault schema to see available properties, object types, and classes."
+
+### 2. Search & Retrieval
+"Search for documents where the 'Customer' property is 'Acme' and 'Document Date' is in 2025."
+"Show me the contents of the 'All Projects' view (ID 101)."
+
+### 3. Creating a Document
+> [!IMPORTANT]
+> To create an object, you usually need the `Class` ID and any mandatory property IDs. Use `discover_schema` first if you don't have them.
+
+"Create a new document in the 'General Document' class. Set the title to 'Project Plan' and the project property to 'Project Alpha'."
+
+### 4. Working with Files
+"Download and read the content of the PDF file (ID 789) attached to document 123."
+"Upload a new text file named 'meeting_notes.md' to document 456 with the content 'Draft notes for the kick-off meeting'."
 
 ## Setup
 

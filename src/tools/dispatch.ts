@@ -96,10 +96,31 @@ export async function callTool(
         path: "/structure/objecttypes",
         method: "GET"
       });
+
+      let classDefinitions: any[] = [];
+      try {
+        const data = await mfiles.requestJson<any>({
+          path: "/structure/classes.aspx",
+          method: "GET"
+        });
+        classDefinitions = Array.isArray(data) ? data : Array.isArray(data?.Items) ? data.Items : [];
+      } catch {
+        try {
+          const data = await mfiles.requestJson<any>({
+            path: "/valuelists/1/items.aspx",
+            method: "GET"
+          });
+          classDefinitions = Array.isArray(data) ? data : Array.isArray(data?.Items) ? data.Items : [];
+        } catch {
+          // Ignore
+        }
+      }
+
       return {
         content: toTextContent({
           propertyDefinitions,
-          objectTypes
+          objectTypes,
+          classDefinitions
         })
       };
     }
@@ -215,11 +236,27 @@ export async function callTool(
       return { content: toTextContent(result) };
     }
     case ToolName.StructureClassDefs: {
-      const result = await mfiles.requestJson({
-        path: "/structure/classdefs.aspx",
-        method: "GET"
-      });
-      return { content: toTextContent(result) };
+      try {
+        const result = await mfiles.requestJson({
+          path: "/structure/classdefs.aspx",
+          method: "GET"
+        });
+        return { content: toTextContent(result) };
+      } catch {
+        try {
+          const result = await mfiles.requestJson({
+            path: "/structure/classes.aspx",
+            method: "GET"
+          });
+          return { content: toTextContent(result) };
+        } catch {
+          const result = await mfiles.requestJson({
+            path: "/valuelists/1/items.aspx",
+            method: "GET"
+          });
+          return { content: toTextContent(result) };
+        }
+      }
     }
     case ToolName.StructureObjectTypes: {
       const result = await mfiles.requestJson({
@@ -268,18 +305,33 @@ export async function callTool(
       }
 
       if (extension === "pdf") {
-        const { bytes } = await mfiles.requestBytes({ path: contentPath, method: "GET" });
-        const pdfParse =
-          (pdfParseNs as any).default ?? (pdfParseNs as any);
-        const data = await pdfParse(Buffer.from(bytes));
-        return {
-          content: toTextContent({
-            filename,
-            extension,
-            contentType: "application/pdf",
-            content: data.text
-          })
-        };
+        try {
+          const { bytes } = await mfiles.requestBytes({ path: contentPath, method: "GET" });
+          const pdfParse = (pdfParseNs as any).default ?? (pdfParseNs as any);
+          const data = await pdfParse(Buffer.from(bytes));
+          return {
+            content: toTextContent({
+              filename,
+              extension,
+              contentType: "application/pdf",
+              content: data.text
+            })
+          };
+        } catch (err: any) {
+          // Fallback to URL if parsing fails (e.g. file too large or corrupted)
+          return {
+            content: toTextContent({
+              filename,
+              extension,
+              error: `PDF text extraction failed: ${err.message}`,
+              download: {
+                url: `${mfiles.getBaseUrl()}${contentPath}`,
+                method: "GET",
+                requiredHeaders: ["X-Authentication"]
+              }
+            })
+          };
+        }
       }
 
       // For other types: return a callable link (client must attach X-Authentication).

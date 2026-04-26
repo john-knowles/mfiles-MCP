@@ -79,6 +79,13 @@ export class MetadataResolver {
       if (id === null || !name) continue;
       this.objectTypesById.set(id, name);
     }
+
+    // Optional: fetch classes if possible.
+    try {
+      await this.fetchClasses();
+    } catch {
+      // Ignore failures during background init.
+    }
   }
 
   private async fetchPropertyDefinitions(): Promise<any[]> {
@@ -99,6 +106,24 @@ export class MetadataResolver {
       throw new Error(`Empty object type list from ${path} (unexpected shape or no items).`);
     }
     return arr;
+  }
+
+  private async fetchClasses(): Promise<any[]> {
+    // Try primary endpoint first.
+    try {
+      const data = await this.mfiles.requestJson<any>({
+        path: "/structure/classes.aspx",
+        method: "GET"
+      });
+      return this.unwrapArray(data);
+    } catch {
+      // Fallback to Value List 1 (Classes).
+      const data = await this.mfiles.requestJson<any>({
+        path: "/valuelists/1/items.aspx",
+        method: "GET"
+      });
+      return this.unwrapArray(data);
+    }
   }
 
   private unwrapArray(data: any): any[] {
