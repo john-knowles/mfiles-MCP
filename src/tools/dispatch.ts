@@ -212,6 +212,16 @@ export async function callTool(
       });
       return { content: toTextContent(result) };
     }
+    case ToolName.ObjectsCheckout: {
+      const { objectType, objectId } = args as any;
+      const result = await checkout(mfiles, objectType, objectId);
+      return { content: toTextContent(result) };
+    }
+    case ToolName.ObjectsCheckin: {
+      const { objectType, objectId, version } = args as any;
+      const result = await checkin(mfiles, objectType, objectId, version);
+      return { content: toTextContent(result) };
+    }
 
     case ToolName.ViewsList: {
       const result = await mfiles.requestJson({ path: "/views.aspx", method: "GET" });

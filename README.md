@@ -29,6 +29,8 @@ An MCP server for the **M-Files Web Service (MFWS) REST API**.
 - **`mfiles_objects_get`**: Fetch a specific object version.
 - **`mfiles_objects_create`**: Create new objects (e.g. Documents).
 - **`mfiles_objects_delete`**: Delete objects from the vault.
+- **`mfiles_objects_checkout`**: Check out an object for editing or deletion.
+- **`mfiles_objects_checkin`**: Check in a previously checked-out object version.
 - **`mfiles_views_list`**: List available vault views.
 - **`mfiles_views_get_listing`**: Fetch items within a specific view.
 - **`mfiles_structure_propertydefs`**: List all property definitions.
@@ -48,11 +50,17 @@ To get the most out of this MCP server, use multi-step workflows.
 "Search for documents where the 'Customer' property is 'Acme' and 'Document Date' is in 2025."
 "Show me the contents of the 'All Projects' view (ID 101)."
 
-### 3. Creating a Document
+### 3. Creating and Managing Objects
 > [!IMPORTANT]
 > To create an object, you usually need the `Class` ID and any mandatory property IDs. Use `discover_schema` first if you don't have them.
 
 "Create a new document in the 'General Document' class. Set the title to 'Project Plan' and the project property to 'Project Alpha'."
+
+> [!TIP]
+> Some vaults require an object to be checked out before it can be deleted. Use `mfiles_objects_checkout` followed by `mfiles_objects_delete`.
+
+"Check out document ID 123 and then delete it."
+"Check in document ID 456 (version 2)."
 
 ### 4. Working with Files
 "Download and read the content of the PDF file (ID 789) attached to document 123."

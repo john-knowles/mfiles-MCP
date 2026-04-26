@@ -8,6 +8,8 @@ export const ToolName = {
   ObjectsGet: "mfiles_objects_get",
   ObjectsCreate: "mfiles_objects_create",
   ObjectsDelete: "mfiles_objects_delete",
+  ObjectsCheckout: "mfiles_objects_checkout",
+  ObjectsCheckin: "mfiles_objects_checkin",
 
   ViewsList: "mfiles_views_list",
   ViewsGetListing: "mfiles_views_get_listing",

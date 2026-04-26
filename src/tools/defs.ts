@@ -91,6 +91,23 @@ export const tools: ToolDef[] = [
       objectId: z.number().int().positive()
     })
   },
+  {
+    name: ToolName.ObjectsCheckout,
+    description: "Check out an object for editing via `/objects/{type}/{id}/latest/checkedout.aspx`.",
+    inputSchema: z.object({
+      objectType: z.number().int().nonnegative(),
+      objectId: z.number().int().positive()
+    })
+  },
+  {
+    name: ToolName.ObjectsCheckin,
+    description: "Check in a previously checked-out object version via `/objects/{type}/{id}/{version}/checkedout.aspx`.",
+    inputSchema: z.object({
+      objectType: z.number().int().nonnegative(),
+      objectId: z.number().int().positive(),
+      version: z.number().int().positive().describe("The version number to check in.")
+    })
+  },
 
   // /views
   {
