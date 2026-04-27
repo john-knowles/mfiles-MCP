@@ -40,7 +40,7 @@ Core tools for interacting with data within the M-Files vault.
 
 | Tool Name | Purpose | Sample Prompt |
 | :--- | :--- | :--- |
-| `mfiles_objects_search` | Search for objects using text or property filters. | "Find all documents with 'Invoice' in the title." or "Search for documents where 'Customer' is 'Acme'." (Tip: Use `queryString` for name-based searches, or find the ID first for Lookup properties like 'Customer'). |
+| `mfiles_objects_search` | Search for objects using text or property filters. | "Find all documents with 'Invoice' in the title." or "Search for documents where 'Customer' is 'Acme'." |
 | `mfiles_objects_get` | Get detailed metadata for a specific object version. | "Get the full details for Document ID 123." |
 | `mfiles_objects_get_properties` | **New:** Get all property values for an object. | "Show me all the property values for Document ID 123." |
 | `mfiles_objects_create_simple` | **Recommended** for creating objects using simple names. (Requires `discover_schema` first). | "Create a new Document called 'Project Plan' in the 'Project' class." |
