@@ -246,18 +246,26 @@ export class MFilesRequest {
     const path = normalizePath(args.path);
     let url = `${this.baseUrl}${path}`;
 
-    let method: "GET" | "POST" = args.method === "GET" ? "GET" : "POST";
-    if (args.method === "PUT" || args.method === "DELETE") {
-      url = addMethodTunnel(url, args.method);
-      method = "POST";
-    }
-
+    let method: string = args.method;
     const headers: Record<string, string> = this.authHeaders(args.headers);
 
     let body: string | undefined;
-    if (args.body !== undefined) {
-      headers["content-type"] = headers["content-type"] ?? "application/json";
-      body = JSON.stringify(args.body);
+    if (args.body !== undefined && args.body !== null) {
+      if (typeof args.body === "string") {
+        body = args.body;
+      } else {
+        const hasContentType = Object.keys(headers).some(h => h.toLowerCase() === "content-type");
+        if (!hasContentType) {
+          headers["Content-Type"] = "application/json";
+        }
+        body = JSON.stringify(args.body);
+      }
+    }
+
+    const tunnel = (args as any).tunnel !== false;
+    if (tunnel && (args.method === "PUT" || args.method === "DELETE")) {
+      url = addMethodTunnel(url, args.method);
+      method = "POST";
     }
 
     const init: RequestInit = { method, headers };

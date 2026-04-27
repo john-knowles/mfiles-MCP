@@ -26,7 +26,12 @@ export const tools: ToolDef[] = [
       headers: z
         .record(z.string(), z.string())
         .optional()
-        .describe("Optional extra headers (content-type is set automatically for JSON).")
+        .describe("Optional extra headers (content-type is set automatically for JSON)."),
+      tunnel: z
+        .boolean()
+        .optional()
+        .default(true)
+        .describe("If true, PUT/DELETE are tunneled via `?_method=`. Set to false to use real HTTP verbs.")
     })
   },
 
@@ -91,7 +96,7 @@ export const tools: ToolDef[] = [
   {
     name: ToolName.ObjectsDelete,
     description:
-      "Delete an object via `/objects/{type}/{id}.aspx` (DELETE tunneled if needed).",
+      "Soft-delete (move to trash) an object via `/objects/{type}/{id}/deleted.aspx`.",
     inputSchema: z.object({
       objectType: z.number().int().nonnegative(),
       objectId: z.number().int().positive()

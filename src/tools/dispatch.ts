@@ -23,6 +23,9 @@ export function listToolsForMcp(): Array<{
 }
 
 function toTextContent(value: unknown): ToolContent[] {
+  if (value === undefined || value === null) {
+    return [{ type: "text", text: "Operation succeeded (no additional data returned)." }];
+  }
   return [{ type: "text", text: JSON.stringify(value, null, 2) }];
 }
 
@@ -179,6 +182,7 @@ export async function callTool(
         method: "GET" | "POST" | "PUT" | "DELETE";
         body?: unknown;
         headers?: Record<string, string>;
+        tunnel?: boolean;
       };
 
       const req: any = {
@@ -187,6 +191,7 @@ export async function callTool(
       };
       if (a.body !== undefined) req.body = a.body as any;
       if (a.headers !== undefined) req.headers = a.headers;
+      if (a.tunnel !== undefined) req.tunnel = a.tunnel;
 
       const result = await mfiles.requestJson(req);
       return { content: toTextContent(result) };
@@ -310,20 +315,21 @@ export async function callTool(
     case ToolName.ObjectsDelete: {
       const { objectType, objectId } = args as any;
       const result = await mfiles.requestJson({
-        path: `/objects/${objectType}/${objectId}.aspx`,
-        method: "DELETE"
+        path: `/objects/${objectType}/${objectId}/deleted.aspx`,
+        method: "PUT",
+        body: { Value: true }
       });
-      return { content: toTextContent(result) };
+      return { content: toTextContent(result ?? { success: true, deleted: true, objectType, objectId }) };
     }
     case ToolName.ObjectsCheckout: {
       const { objectType, objectId } = args as any;
       const result = await checkout(mfiles, objectType, objectId);
-      return { content: toTextContent(result) };
+      return { content: toTextContent(result ?? { success: true, checkedOut: true, objectType, objectId }) };
     }
     case ToolName.ObjectsCheckin: {
       const { objectType, objectId, version } = args as any;
       const result = await checkin(mfiles, objectType, objectId, version);
-      return { content: toTextContent(result) };
+      return { content: toTextContent(result ?? { success: true, checkedIn: true, objectType, objectId, version }) };
     }
 
 
