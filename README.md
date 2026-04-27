@@ -97,6 +97,32 @@ npm run build
 npm start
 ```
 
+## Claude Desktop Configuration
+
+To use this server with Claude Desktop, add the following to your `claude_desktop_config.json` (found at `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+```json
+{
+  "mcpServers": {
+    "mfiles": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/mfiles-MCP/dist/index.js"
+      ],
+      "env": {
+        "MFILES_BASE_URL": "https://your-vault.cloudvault.m-files.com/REST",
+        "MFILES_USERNAME": "your-username",
+        "MFILES_PASSWORD": "your-password",
+        "MFILES_VAULT_GUID": "{YOUR-VAULT-GUID}"
+      }
+    }
+  }
+}
+```
+
+> [!NOTE]
+> Ensure you use the absolute path to the `dist/index.js` file. The environment variables in the `env` section will override any values in a local `.env` file when running via Claude Desktop.
+
 ## Notes
 
 - MFWS commonly uses `.aspx` endpoints. The tools accept any path, but you’ll usually want `.aspx`.

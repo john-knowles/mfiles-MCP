@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "mfiles": {
+      "command": "node",
+      "args": [
+        "/path/to/your/mfiles-MCP/dist/index.js"
+      ],
+      "env": {
+        "MFILES_BASE_URL": "https://your-vault.cloudvault.m-files.com/REST",
+        "MFILES_USERNAME": "your-username",
+        "MFILES_PASSWORD": "your-password",
+        "MFILES_VAULT_GUID": "{YOUR-VAULT-GUID}"
+      }
+    }
+  }
+}
